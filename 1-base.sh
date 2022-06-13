@@ -17,6 +17,10 @@ echo "127.0.1.1 $INSTALL_HOSTNAME.$INSTALL_DOMAIN $INSTALL_HOSTNAME" >> /etc/hos
 
 pacman -S --noconfirm --needed base-devel sysfsutils usbutils e2fsprogs inetutils netctl nano less which man-db man-pages sudo wget curl reflector rsync grub networkmanager dhclient
 
+# Add sudo rights
+sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
 ## CPU Microcode
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
@@ -42,8 +46,11 @@ elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
   pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
 
+## Setup user
+useradd -m -G wheel,audio,video,storage -s /bin/bash $USERNAME 
+
 systemctl enable NetworkManager
 
-pacman -S grub os-prober efibootmgr dosfstools mtools gptfdisk fatresize
+pacman -S --noconfirm --needed grub os-prober efibootmgr dosfstools mtools gptfdisk fatresize
 grub-install --target=x86_64-efi --bootloader-id=ArchLinux --efi-directory=/boot/efi
 grub-mkconfig -o /boot/grub/grub.cfg
