@@ -1,3 +1,5 @@
-#systemctl enable bluetooth.service
+#!/bin/bash
 
- bluez bluez-utils
+ pacman -S --noconfirm --needed bluez bluez-utils
+ systemctl enable bluetooth.service
+ 
